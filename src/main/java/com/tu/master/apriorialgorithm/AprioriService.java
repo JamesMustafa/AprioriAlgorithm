@@ -1,47 +1,19 @@
 package com.tu.master.apriorialgorithm;
 
-import com.tu.master.apriorialgorithm.domain.StoreTransaction;
-import com.tu.master.apriorialgorithm.domain.StoreTransactionRepository;
+import ca.pfv.spmf.algorithms.frequentpatterns.apriori.AlgoApriori;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
 
 @Service
 public class AprioriService {
 
-    private static final Double MINIMAL_SUPPORT = 0.5;
-    private final StoreTransactionRepository transactionRepository;
+    private static final Double MINIMAL_SUPPORT = 0.2;
 
-    public AprioriService(StoreTransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
+    //TODO: Stupid algorithm cannot work with strings :D / Should put items into map and set an integer id
+    public static void main(String[] args) throws IOException {
+        AlgoApriori apriori = new AlgoApriori();
+        apriori.runAlgorithm(MINIMAL_SUPPORT, "sample_fpgrowth.txt", "result.txt");
+        apriori.printStats();
     }
-
-
-    public String convertDatabase() {
-        List<String> idk = new ArrayList<>();
-        List<StoreTransaction> transactions = new ArrayList<>(transactionRepository.findAll());
-        transactions.forEach(transaction -> {
-            var x = transactions.stream()
-                    .filter(t -> t.getCustomerId().equals(transaction.getCustomerId()) &&
-                            t.getDate().equals(transaction.getDate()))
-                    .collect(Collectors.toList());
-            StoreTransaction newTransaction = new StoreTransaction();
-            newTransaction.setDate(transaction.getDate());
-            newTransaction.setCustomerId(transaction.getCustomerId());
-
-            String items = x.stream()
-                    .map(StoreTransaction::getItems)
-                    .flatMap(Collection::stream)
-                    .distinct()
-                    .collect(Collectors.joining(", "));
-
-            newTransaction.setItems(items);
-            System.out.println("New: " + newTransaction);
-        });
-        return "done";
-    }
-
 }
