@@ -4,6 +4,9 @@ import com.tu.master.apriorialgorithm.domain.StoreTransaction;
 import com.tu.master.apriorialgorithm.domain.StoreTransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,10 +15,16 @@ import java.util.stream.Collectors;
 @Service
 public class TransactionService {
 
+    public static final String TRANSACTION_FILE_NAME = "apriori-transactions.txt";
     private final StoreTransactionRepository transactionRepository;
 
     public TransactionService(StoreTransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
+    }
+
+    public void convertTransactionsToSpmf(List<StoreTransaction> transactions) throws IOException {
+        List<String> transactionItems = getTransactionItems(transactions);
+        FileParser.writeToSpmf(transactions, transactionItems, TRANSACTION_FILE_NAME);
     }
 
     //TODO: Common are all transactions which are made by one customer in a single day
@@ -30,6 +39,14 @@ public class TransactionService {
         });
 
         return detailedTransactions;
+    }
+
+    public List<String> getTransactionItems(List<StoreTransaction> transactions) {
+        return transactions.stream()
+                .map(StoreTransaction::getItems)
+                .flatMap(List::stream)
+                .distinct()
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private List<StoreTransaction> filterCommonTransactions(StoreTransaction transaction,
