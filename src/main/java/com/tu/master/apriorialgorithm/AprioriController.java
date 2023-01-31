@@ -7,21 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/apriori")
 public class AprioriController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AprioriController.class);
+    private static final Logger log = LoggerFactory.getLogger(AprioriController.class);
 
     private final AprioriService aprioriService;
     private final TransactionService transactionService;
@@ -33,11 +28,11 @@ public class AprioriController {
 
     @GetMapping("/execute")
     public String executeApriori(
-            @RequestParam(name = "convert", required = false, defaultValue = "false") Boolean convert,
+            @RequestParam(name = "process", required = false, defaultValue = "true") Boolean process,
             @RequestParam(name = "support", required = false) Double support) throws IOException {
-        LOGGER.info("Execution request has been made. Support: {}, Convert: {}", support, convert);
+        log.info("Execution request has been made. Support: {}, Process: {}", support, process);
 
-        List<String> transactionItems = processTransactions(convert);
+        List<String> transactionItems = processTransactions(process);
         aprioriService.execute(support);
 
         return getResults(transactionItems);
@@ -56,15 +51,14 @@ public class AprioriController {
             String endResult = line.substring(endIndex);
             stringBuilder.append(resultItems).append("  / ").append(endResult).append("<br>");
         });
-
+        log.info("Transaction result is returned to user");
         return stringBuilder.toString();
     }
 
-    private List<String> processTransactions(Boolean convert) throws IOException {
-        var transactions = transactionService.getCombinedTransactions();
-        if (convert) {
-            transactionService.convertTransactionsToSpmf(transactions);
+    private List<String> processTransactions(Boolean process) {
+        if (process) {
+            transactionService.processJoinTransactions();
         }
-        return transactionService.getTransactionItems(transactions);
+        return transactionService.getTransactionItems();
     }
 }

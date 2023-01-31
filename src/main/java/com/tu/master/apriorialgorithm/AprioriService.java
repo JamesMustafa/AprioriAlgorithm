@@ -2,7 +2,6 @@ package com.tu.master.apriorialgorithm;
 
 import ca.pfv.spmf.algorithms.frequentpatterns.apriori.AlgoApriori;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 
@@ -15,7 +14,7 @@ public class AprioriService {
     public void execute(Double support) throws IOException {
         AlgoApriori apriori = new AlgoApriori();
 
-        if(support == null) {
+        if (support == null) {
             support = MINIMAL_SUPPORT;
         }
 

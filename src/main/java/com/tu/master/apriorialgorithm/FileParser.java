@@ -1,5 +1,6 @@
 package com.tu.master.apriorialgorithm;
 
+import com.tu.master.apriorialgorithm.domain.JointStoreTransaction;
 import com.tu.master.apriorialgorithm.domain.StoreTransaction;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 
 public final class FileParser {
 
-    public static void writeToSpmf(List<StoreTransaction> transactions, List<String> items, String filePath)
+    public static void writeToSpmf(List<JointStoreTransaction> transactions, List<String> items, String filePath)
             throws IOException {
         FileWriter fileWriter = new FileWriter(filePath);
         PrintWriter printWriter = new PrintWriter(fileWriter);

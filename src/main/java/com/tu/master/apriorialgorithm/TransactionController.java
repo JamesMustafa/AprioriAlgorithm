@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/transactions")
 public class TransactionController {
 
     private final TransactionService aprioriService;
@@ -20,14 +20,15 @@ public class TransactionController {
 
     @GetMapping("/convert")
     public String convertItems() throws IOException {
-        List<StoreTransaction> transactions = aprioriService.getCombinedTransactions();
+        var transactions = aprioriService.getJointTransactions();
         aprioriService.convertTransactionsToSpmf(transactions);
         return "Success";
     }
 
-    @GetMapping("/size")
-    public Integer getTransactionSize() {
-        return aprioriService.getCombinedTransactions().size();
+    @GetMapping("/combine")
+    public String combineTransactions() {
+        aprioriService.processJoinTransactions();
+        return "Success";
     }
 
 }

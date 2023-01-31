@@ -10,10 +10,10 @@ import java.util.*;
 
 @Data
 @Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "transactions")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class StoreTransaction {
 
     @Id
