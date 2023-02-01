@@ -29,18 +29,52 @@ public class AprioriController {
     @GetMapping("/execute")
     public String executeApriori(
             @RequestParam(name = "process", required = false, defaultValue = "true") Boolean process,
-            @RequestParam(name = "support", required = false) Double support) throws IOException {
-        log.info("Execution request has been made. Support: {}, Process: {}", support, process);
+            @RequestParam(name = "support", required = false) Double support,
+            @RequestParam(name = "confidence", required = false) Double confidence) throws IOException {
+        log.info("Execution request has been made. Support: {}, Confidence: {}, Process: {}", support, confidence, process);
 
         List<String> transactionItems = processTransactions(process);
-        aprioriService.execute(support);
+        aprioriService.execute(support, confidence);
 
-        return getResults(transactionItems);
+        return getConfidenceResults(transactionItems) + getSupportResults(transactionItems);
     }
 
-    private String getResults(List<String> transactionItems) {
+    private String getConfidenceResults(List<String> transactionItems) {
+        List<String> results = FileParser.readFile(AprioriService.ASSOC_RULES_OUTPUT_FILE);
+        StringBuilder stringBuilder = new StringBuilder();
+        results.forEach(line -> {
+            int endIndex = line.indexOf('#');
+
+            String resultItems = Arrays.stream(line.substring(0, endIndex).split(" "))
+                    .map(index -> {
+                        try {
+                            return transactionItems.get(Integer.parseInt(index));
+                        } catch (NumberFormatException e){
+                            return index;
+                        }
+
+                    })
+                    .collect(Collectors.joining(" "));
+
+            String support = line.substring(line.indexOf(':') + 1, line.lastIndexOf('#'));
+            float confidence = Float.parseFloat(line.substring(line.lastIndexOf(':') + 1));
+
+            stringBuilder.append(resultItems)
+                    .append("  / Support: ")
+                    .append(support)
+                    .append(", Confidence: ")
+                    .append(String.format("%.2f", confidence * 100))
+                    .append(" %")
+                    .append("<br>");
+        });
+        log.info("Transaction result is returned to user");
+        return stringBuilder.toString();
+    }
+
+    private String getSupportResults(List<String> transactionItems) {
         List<String> results = FileParser.readFile(AprioriService.APRIORI_OUTPUT_FILE);
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<br>").append("<br>").append("<br>");
         results.forEach(line -> {
             int endIndex = line.indexOf('#');
 

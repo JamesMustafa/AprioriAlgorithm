@@ -19,7 +19,7 @@ public class TransactionController {
     }
 
     @GetMapping("/convert")
-    public String convertItems() throws IOException {
+    public String convertItemsToSpmf() throws IOException {
         var transactions = aprioriService.getJointTransactions();
         aprioriService.convertTransactionsToSpmf(transactions);
         return "Success";

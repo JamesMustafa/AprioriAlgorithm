@@ -3,8 +3,6 @@ package com.tu.master.apriorialgorithm.domain;
 import lombok.*;
 
 import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
